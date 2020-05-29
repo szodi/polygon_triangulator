@@ -2,7 +2,7 @@ package triangulator;
 
 import java.awt.Point;
 
-public class Edge {
+public class Edge implements Comparable<Edge> {
 
 	private final Point start;
 	private final Point end;
@@ -42,6 +42,11 @@ public class Edge {
 
 	public double getLengthSq() {
 		return start.distanceSq(end.x, end.y);
+	}
+
+	@Override
+	public int compareTo(Edge edge) {
+		return (int)(getLengthSq() - edge.getLengthSq());
 	}
 
 	@Override

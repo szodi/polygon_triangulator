@@ -38,12 +38,12 @@ public class PolygonTriangulator {
 				allPossibleEdges.add(new Edge(points.get(i), points.get(j)));
 			}
 		}
-		Collections.sort(allPossibleEdges, (edge1, edge2) -> (int)(edge1.getLengthSq() - edge2.getLengthSq()));
-		allPossibleEdges.stream()
-			.filter(edge -> 
-				allEdges.stream().noneMatch(edge::intersects) &&
-				polygon.contains(edge.getMiddlePoint()))
-			.forEach(allEdges::add);
+		Collections.sort(allPossibleEdges);
+		for (Edge edge : allPossibleEdges) {
+			if (allEdges.stream().noneMatch(edge::intersects) && polygon.contains(edge.getMiddlePoint())) {
+				allEdges.add(edge);
+			}
+		}
 		return allEdges;
 	}
 }
