@@ -1,49 +1,35 @@
 package triangulator;
 
-import java.awt.Point;
 import java.awt.Polygon;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 public class PolygonTriangulator {
 
-	private Polygon polygon;
-	private List<Point> points = new ArrayList<>();
-	private Set<Edge> edges = new HashSet<>();
-
-	public PolygonTriangulator(Polygon polygon) {
-		this.polygon = polygon;
-		Point lastPoint = new Point(polygon.xpoints[polygon.npoints - 1], polygon.ypoints[polygon.npoints - 1]);
+	public static Set<Edge> triangularize(Polygon polygon) {
+		Set<Edge> allEdges = new HashSet<>();
+		List<Edge> allPossibleInternalEdges = new ArrayList<>();
 		for (int i = 0; i < polygon.npoints; i++) {
-			Point point = new Point(polygon.xpoints[i], polygon.ypoints[i]);
-			points.add(point);
-			edges.add(new Edge(lastPoint, point));
-			lastPoint = point;
-		}
-	}
+			// stores the polygon sides as edges (current point as edge-start, next point as edge-end)
+			allEdges.add(new Edge(polygon.xpoints[i], polygon.ypoints[i], polygon.xpoints[(i + 1) % polygon.npoints], polygon.ypoints[(i + 1) % polygon.npoints]));
 
-	public Set<Edge> getEdges() {
-		return edges;
-	}
-
-	public Set<Edge> triangularize() {
-		Set<Edge> allEdges = edges.parallelStream().collect(Collectors.toSet());
-		List<Edge> allPossibleEdges = new ArrayList<>();
-		for (int i = 0; i < points.size() - 1; i++) {
-			for (int j = i; j < points.size(); j++) {
-				allPossibleEdges.add(new Edge(points.get(i), points.get(j)));
+			// creates every single point-pairs as edges. i is the current point's index, i + 1 is the next one, which is already stored in allEdges
+			for (int j = i + 2; j < polygon.npoints; j++) {
+				allPossibleInternalEdges.add(new Edge(polygon.xpoints[i], polygon.ypoints[i], polygon.xpoints[j], polygon.ypoints[j]));
 			}
 		}
-		Collections.sort(allPossibleEdges);
-		for (Edge edge : allPossibleEdges) {
-			if (allEdges.stream().noneMatch(edge::intersects) && polygon.contains(edge.getMiddlePoint())) {
-				allEdges.add(edge);
-			}
-		}
+
+		// sorts by edge length in descending order
+		Collections.sort(allPossibleInternalEdges);
+
+		allPossibleInternalEdges.stream().filter(edge ->
+		// the next two conditions shows if the current edge is totally inside the polygon: no intersections, is any of its points inside
+				allEdges.stream().noneMatch(edge::intersects) && // checks if current edge intersects any other edges in allEdges. If not, then OK
+				polygon.contains((edge.x1 + edge.x2) / 2, (edge.y1 + edge.y2) / 2)) // checks if current edge's middle point is inside the polygon
+				.forEach(allEdges::add);
 		return allEdges;
 	}
 }

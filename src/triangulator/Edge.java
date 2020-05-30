@@ -1,60 +1,56 @@
 package triangulator;
 
-import java.awt.Point;
-
 public class Edge implements Comparable<Edge> {
 
-	private final Point start;
-	private final Point end;
+	public final int x1;
+	public final int y1;
+	public final int x2;
+	public final int y2;
 
-	public Edge(Point start, Point end) {
-		this.start = start;
-		this.end = end;
+	public Edge(int x1, int y1, int x2, int y2) {
+		this.x1 = x1;
+		this.y1 = y1;
+		this.x2 = x2;
+		this.y2 = y2;
 	}
 
-	public boolean isToCW(Point point) {
-		return ((end.x - start.x) * (point.y - start.y) - (end.y - start.y) * (point.x - start.x)) > 0;
-	}
-
-	public Point getMiddlePoint() {
-		int middleX = (start.x + end.x) / 2;
-		int middleY = (start.y + end.y) / 2;
-		return new Point(middleX, middleY);
-	}
-
-	public Point getStart() {
-		return start;
-	}
-
-	public Point getEnd() {
-		return end;
+	public boolean isToCW(int px, int py) {
+		return ((x2 - x1) * (py - y1) - (y2 - y1) * (px - x1)) > 0;
 	}
 
 	public boolean intersects(Edge edge) {
-		if (equals(edge)) {
-			return true;
+		if (x1 == edge.x1 && y1 == edge.y1) {
+			return x2 == edge.x2 && y2 == edge.y2;
 		}
-		if (start.equals(edge.getStart()) || start.equals(edge.getEnd()) || end.equals(edge.getStart()) || end.equals(edge.getEnd())) {
-			return false;
+		if (x2 == edge.x2 && y2 == edge.y2) {
+			return x1 == edge.x1 && y1 == edge.y1;
 		}
-		return (isToCW(edge.getStart()) == !isToCW(edge.getEnd())) && (edge.isToCW(start) == !edge.isToCW(end));
+		if (x1 == edge.x2 && y1 == edge.y2) {
+			return x2 == edge.x1 && y2 == edge.y1;
+		}
+		if (x2 == edge.x1 && y2 == edge.y1) {
+			return x1 == edge.x2 && y1 == edge.y2;
+		}
+		return (isToCW(edge.x1, edge.y1) == !isToCW(edge.x2, edge.y2)) && (edge.isToCW(x1, y1) == !edge.isToCW(x2, y2));
 	}
 
-	public double getLengthSq() {
-		return start.distanceSq(end.x, end.y);
+	public int getLengthSq() {
+		return (x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2);
 	}
 
 	@Override
 	public int compareTo(Edge edge) {
-		return (int)(getLengthSq() - edge.getLengthSq());
+		return getLengthSq() - edge.getLengthSq();
 	}
 
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((end == null) ? 0 : end.hashCode());
-		result = prime * result + ((start == null) ? 0 : start.hashCode());
+		result = prime * result + x1;
+		result = prime * result + x2;
+		result = prime * result + y1;
+		result = prime * result + y2;
 		return result;
 	}
 
@@ -66,19 +62,7 @@ public class Edge implements Comparable<Edge> {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		Edge other = (Edge)obj;
-		if (end == null) {
-			if (other.end != null)
-				return false;
-		}
-		else if (!end.equals(other.end) && !end.equals(other.start))
-			return false;
-		if (start == null) {
-			if (other.start != null)
-				return false;
-		}
-		else if (!start.equals(other.start) && !start.equals(other.end))
-			return false;
-		return true;
+		Edge edge = (Edge)obj;
+		return (((x1 == edge.x1 && y1 == edge.y1) && (x2 == edge.x2 && y2 == edge.y2)) || ((x1 == edge.x2 && y1 == edge.y2) && (x2 == edge.x1 && y2 == edge.y1)));
 	}
 }

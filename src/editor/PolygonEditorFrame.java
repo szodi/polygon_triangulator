@@ -43,11 +43,10 @@ public class PolygonEditorFrame extends BufferedFrame implements MouseListener, 
 		g.setColor(Color.black);
 		Polygon polygon = createPolygon();
 		if (polygon != null) {
-			PolygonTriangulator polygonTriangulator = new PolygonTriangulator(polygon);
-			drawEdges(g, polygonTriangulator.getEdges());
+			g.drawPolygon(polygon);
 			if (showTriangleEdges) {
 				g.setColor(Color.green);
-				drawEdges(g, polygonTriangulator.triangularize());
+				drawEdges(g, PolygonTriangulator.triangularize(polygon));
 			}
 		}
 		int i = 0;
@@ -59,7 +58,7 @@ public class PolygonEditorFrame extends BufferedFrame implements MouseListener, 
 
 	public void drawEdges(Graphics g, Collection<Edge> edges) {
 		for (Edge edge : edges) {
-			drawDashedLine(g, edge.getStart().x, edge.getStart().y, edge.getEnd().x, edge.getEnd().y);
+			drawDashedLine(g, edge.x1, edge.y1, edge.x2, edge.y2);
 		}
 	}
 
