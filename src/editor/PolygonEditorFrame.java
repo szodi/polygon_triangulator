@@ -30,6 +30,7 @@ public class PolygonEditorFrame extends BufferedFrame implements MouseListener, 
 	Point activePoint;
 
 	boolean showTriangleEdges = false;
+	boolean showBoundigBoxes = false;
 
 	public PolygonEditorFrame() {
 		super();
@@ -46,7 +47,19 @@ public class PolygonEditorFrame extends BufferedFrame implements MouseListener, 
 			g.drawPolygon(polygon);
 			if (showTriangleEdges) {
 				g.setColor(Color.green);
-				drawEdges(g, PolygonTriangulator.triangularize(polygon));
+				drawEdges(g, PolygonTriangulator.triangularize(polygon.xpoints, polygon.ypoints, polygon.npoints));
+			}
+			if (showBoundigBoxes) {
+				g.setColor(Color.lightGray);
+				for (int i = 0; i < polygon.npoints; i++) {
+					int x1 = polygon.xpoints[i];
+					int y1 = polygon.ypoints[i];
+					int x2 = polygon.xpoints[(i + 1) % polygon.npoints];
+					int y2 = polygon.ypoints[(i + 1) % polygon.npoints];
+					int x = Math.min(x1, x2);
+					int y = Math.min(y1, y2);
+					g.drawRect(x, y, Math.abs(x1 - x2), Math.abs(y1 - y2));
+				}
 			}
 		}
 		int i = 0;
@@ -145,6 +158,10 @@ public class PolygonEditorFrame extends BufferedFrame implements MouseListener, 
 	public void keyPressed(KeyEvent e) {
 		if (e.getKeyCode() == KeyEvent.VK_H) {
 			showTriangleEdges = !showTriangleEdges;
+			repaint();
+		}
+		else if (e.getKeyCode() == KeyEvent.VK_B) {
+			showBoundigBoxes = !showBoundigBoxes;
 			repaint();
 		}
 		else if (e.getKeyCode() == KeyEvent.VK_R) {
