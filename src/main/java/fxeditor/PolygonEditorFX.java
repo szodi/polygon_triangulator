@@ -27,7 +27,7 @@ import mesh.MeshBuilder;
 // Usage: draw a polygon, and hit 'H', then modify the dots
 public class PolygonEditorFX extends Application implements EventHandler<MouseEvent> {
 
-	private static String IMAGE_FILE_1 = "file:///g:\\imagevenue\\Lana_I\\72405_met-art.com_20161021\\MetArt_Presenting-Lana_Lana-I_high_0118.jpg";
+	private static String IMAGE_FILE_1 = "<image-file-path-here>";
 
 	public Canvas canvas = new Canvas();
 	private AnchorPane anchorPane = new AnchorPane();
